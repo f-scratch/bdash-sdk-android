@@ -1,0 +1,108 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+android {
+    def publish = project.tasks.create("publishAll")
+    android.libraryVariants.all { variant ->
+
+        if (variant.name == "debug" || variant.name == "release") {
+            variant.outputs.each { output ->
+                if (output.outputFileName.endsWith('.aar')) {
+
+                    def date = new java.text.SimpleDateFormat("yyyyMMdd").format(new Date())
+                    def messaging = libraryVersion()
+                    def baseName= "${variant.name}_${date}_api${rootProject.ext.compileSdkVersion}_${messaging}_v${rootProject.ext.sdkVersion}";
+                    def newName = "${baseName}.aar"
+
+                    def srcDir = variant.packageLibraryProvider.get().archiveFile.get().asFile.parentFile
+                    def task = project.tasks.create("publish${variant.name.capitalize()}Aar", Copy)
+                    task.from(srcDir)
+                    task.rename (output.outputFileName, newName)
+                    task.into(file("build\\outputs"))
+                    task.doLast {
+                        println " >>make aar ${variant.name} success!";
+                    }
+
+                    task.dependsOn variant.getAssembleProvider().get()
+                    publish.dependsOn(task)
+                }
+            }
+            return
+        }
+    }
+}
+
+task toolChainCheck {
+    def tree = fileTree(include: ['*.gradle'], dir: './')
+    def hasError = false
+    tree.each { File file ->
+
+        println file
+        def reader = new BufferedReader(new FileReader(file));
+        def buffer = new StringBuffer();
+        def str;
+        while( (str=reader.readLine())!=null ){
+            buffer.append(str)
+            buffer.append("\n")
+        }
+        str = buffer.toString()
+
+        def find = ["[\\s]*jackOptions", "[\\s]*retrolambda "]
+        find.each { name ->
+            Pattern ptn = Pattern.compile(name);
+            Matcher matcher = ptn.matcher(str);
+            if( matcher.matches() ){
+                hasError = true
+            }
+        }
+    }
+
+    println ""
+    if( hasError ) {
+        println "[Warning] Android's default-tool-chain is Deactivate!!"
+    } else {
+        println "No Problem: Android's default-tool-chain is Active."
+    }
+    println ""
+}
+
+def libraryVersion() {
+
+    def tree = fileTree(include: ['build.gradle'], dir: './')
+    def result = 'unknown';
+    tree.each { File file ->
+
+        def reader = new BufferedReader(new FileReader(file));
+        def buffer = new StringBuffer();
+        def str;
+        while ((str = reader.readLine()) != null) {
+            buffer.append(str)
+            buffer.append("\n")
+        }
+        str = buffer.toString()
+
+        def i = 0;
+        def find = [
+                "firebase-messaging:(\\d+([0-9]|\\.)*)"
+              , "appcompat:(\\d+([0-9]|\\.)*)"
+              , "services-ads-identifier:(\\d+([0-9]|\\.)*)"
+        ]
+        find.each { regex ->
+            Pattern ptn = Pattern.compile(regex);
+            Matcher matcher = ptn.matcher(str);
+            if( matcher.find() ){
+                if( i==0 ) {
+                    result = "m"
+                } else if ( i==1 ){
+                    result += "_a"
+                } else if ( i==2 ){
+                    result += "_id"
+                }
+                result += matcher.group(1);
+            }else{
+            }
+            i++;
+        }
+    }
+    return result
+}

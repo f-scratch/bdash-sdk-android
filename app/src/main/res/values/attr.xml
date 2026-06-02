@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BDashButton">
+
+        <attr name="bdash_headerTextColor" format="color" />
+        <attr name="bdash_headerBackground" format="reference" />
+        <attr name="bdash_showButton" format="reference" />
+        <attr name="bdash_closeButton" format="reference" />
+    </declare-styleable>
+</resources>

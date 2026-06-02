@@ -1,0 +1,41 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+
+    ext {
+        sdkVersion = "6.4.1"        // 現行の SDK バージョン
+        releaseSdkVersion = "6.4.1" // 次リリースする SDK バージョン
+    }
+
+    ext {
+        compileSdkVersion = 36
+        buildToolsVersion = "34.0.0"
+        minSdkVersion = 24
+        targetSdkVersion =  36
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.4.0'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

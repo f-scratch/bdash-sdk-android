@@ -1,0 +1,105 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+<!-- ############## プッシュ通知の初回バージョンで提供 ################# -->
+    <!-- bdash 用テーマ -->
+    <style name="BDashSDK_ThemeParent" parent="Theme.AppCompat.NoActionBar" tools:ignore="UnusedResources">
+        <item name="windowActionBar">false</item>
+        <item name="colorPrimary">#2196F3</item>
+        <item name="colorPrimaryDark">#1976D2</item>
+        <item name="colorAccent">#FF4081</item>
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <!-- bdash 用テーマその1 -->
+    <style name="BDashSDK_Theme" parent="BDashSDK_ThemeParent" tools:keep="@style/BDashSDK_Theme">
+        <item name="android:textColor">#ffffff</item>
+        <item name="colorControlNormal">#666666</item>
+    </style>
+
+    <!-- bdash 用テーマその2 -->
+    <style name="BDashSDK_Theme.green" parent="BDashSDK_ThemeParent" tools:keep="@style/BDashSDK_Theme_green">
+        <item name="colorPrimary">#aed581</item>
+        <item name="colorControlNormal">#00aa00</item>
+        <item name="colorAccent">#0000aa</item>
+    </style>
+
+    <!-- bdash 用テーマその3 -->
+    <style name="BDashSDK_Theme.gray" parent="BDashSDK_ThemeParent" tools:keep="@style/BDashSDK_Theme_gray">
+        <item name="android:textColor">#303030</item>
+        <item name="colorPrimary">#dddddd</item>
+        <item name="colorControlNormal">#00aa00</item>
+        <item name="colorAccent">#2196F3</item>
+    </style>
+
+
+    <!-- bdash 用 プログレステーマ ロリポップ以降-->
+    <style name="BDashSDK_Theme_Progress" parent="@android:style/Widget.Holo.ProgressBar">
+        <item name="colorAccent">#bbbbbb</item>
+        <item name="android:textColor">#bbbbbb</item>
+
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <!-- bdash 用 プログレステーマ ロリポップより前-->
+    <style name="BDashSDK_Theme_Progress_PrevLollipop" parent="@android:style/Widget.Holo.ProgressBar">
+        <item name="android:textColor">#bbbbbb</item>
+
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+<!-- ############## ここまで ################# -->
+
+<!-- ############## プッシュ通知のダイアログカラー ################# -->
+    <style name="BDashSDK_PopupTheme_black" parent="Base.Widget.AppCompat.Button" tools:keep="@style/BDashSDK_PopupTheme_black">
+        <item name="bdash_showButton">@drawable/com_f_scratch_bdash_mobile_notification_draw_button_01_yes</item>
+        <item name="bdash_closeButton">@drawable/com_f_scratch_bdash_mobile_notification_draw_button_01_no</item>
+        <item name="bdash_headerBackground">@drawable/com_f_scratch_bdash_mobile_notification_draw_layout_frame_black</item>
+        <item name="bdash_headerTextColor">#ffffff</item>
+    </style>
+    <style name="BDashSDK_PopupTheme_white" parent="Base.Widget.AppCompat.Button">
+        <item name="bdash_showButton">@drawable/com_f_scratch_bdash_mobile_notification_draw_button_01_yes</item>
+        <item name="bdash_closeButton">@drawable/com_f_scratch_bdash_mobile_notification_draw_button_01_no</item>
+        <item name="bdash_headerBackground">@drawable/com_f_scratch_bdash_mobile_notification_draw_layout_frame_white</item>
+        <item name="bdash_headerTextColor">#000000</item>
+    </style>
+<!-- ############## ここまで ################# -->
+
+<!-- ############## プッシュ通知の Activity 定義用テーマ ################# -->
+    <style name="BDashSDK_PopupNotification" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.0</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+<!-- ############## ここまで ################# -->
+
+
+
+<!-- ############## Web接客用のテーマ ################# -->
+    <style name="BDashSDK_WebPopupTheme" parent="@android:style/Theme.Holo.Light.Dialog.NoActionBar">
+        <item name="android:backgroundDimAmount">0.0</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    <style name="BDashSDK_WebPopupModalTheme" parent="@android:style/Theme.Holo.Light.Dialog.NoActionBar">
+        <item name="android:backgroundDimAmount">0.5</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+    <!-- ############## ここまで ################# -->
+
+</resources>

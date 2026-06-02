@@ -1,0 +1,164 @@
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream {stream ->
+        localProperties.load(stream)
+    }
+}
+
+android {
+
+    compileSdk rootProject.ext.compileSdkVersion
+    buildToolsVersion = rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+
+        buildConfigField("String", "SDK_VERSION", "\"${rootProject.ext.sdkVersion}\"")
+        buildConfigField("String", "SDK_RELEASE_VERSION", "\"${rootProject.ext.releaseSdkVersion}\"")
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE.txt'
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+
+    namespace 'com.f_scratch.bdash.mobile.analytics'
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0', {
+        exclude group: 'com.android.support', module: 'support-v4'
+    }
+
+    // Web接客以降 json parse に利用
+    implementation 'com.google.code.gson:gson:2.13.2'
+
+    // AndroidX
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.annotation:annotation:1.9.1'
+
+    // OkHttp3
+    implementation 'com.squareup.okhttp3:okhttp:5.3.2'
+
+    // for testing.
+    androidTestImplementation 'androidx.test:core:1.7.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1', {
+        transitive = false
+    }
+    androidTestImplementation 'androidx.test:runner:1.7.0'
+    androidTestImplementation 'androidx.test:rules:1.7.0'
+    androidTestImplementation 'org.assertj:assertj-core:3.27.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.7.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                groupId = project.findProperty('GROUP')
+                artifactId = project.findProperty('ARTIFACT_ID')
+                version = project.findProperty('VERSION_NAME')
+
+//                pom {
+//                    name = project.findProperty('POM_NAME')
+//                    description = project.findProperty('POM_DESCRIPTION')
+//                    url = project.findProperty('POM_URL')
+//
+//                    licenses {
+//                        license {
+//                            name = project.findProperty('POM_LICENSE_NAME')
+//                            url = project.findProperty('POM_LICENSE_URL')
+//                        }
+//                    }
+//
+//                    developers {
+//                        developer {
+//                            id = project.findProperty('POM_DEVELOPER_ID')
+//                            name = project.findProperty('POM_DEVELOPER_NAME')
+//                            email = project.findProperty('POM_DEVELOPER_EMAIL')
+//                        }
+//                    }
+//
+//                    scm {
+//                        connection = project.findProperty('POM_SCM_CONNECTION')
+//                        developerConnection = project.findProperty('POM_SCM_DEV_CONNECTION')
+//                        url = project.findProperty('POM_SCM_URL')
+//                    }
+//                }
+            }
+        }
+
+        repositories {
+            // maven central
+//            maven {
+//                name = 'MavenCentral'
+//                url = uri('https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/')
+//                credentials {
+//                    username = localProperties['ossrhUsername'] ?: System.getenv('OSSRH_USER')
+//                    password = localProperties['ossrhPassword'] ?: System.getenv('OSSRH_TOKEN')
+//                }
+//            }
+
+            // GitHub Packages
+            maven {
+                name = 'GitHubPackages'
+                url = uri('https://maven.pkg.github.com/f-scratch/bdash-sdk-android')
+                credentials {
+                    username = localProperties['github.user'] ?: System.getenv('GITHUB_USER')
+                    password = localProperties['github.token'] ?: System.getenv('GITHUB_TOKEN')
+                }
+            }
+        }
+    }
+
+//    signing {
+//        def signingKey = localProperties['signingKey'] ?: System.getenv('SIGNING_KEY')
+//        def signingPassword = localProperties['signingPassword'] ?: System.getenv('SIGNING_PASSWORD')
+//        useInMemoryPgpKeys(signingKey, signingPassword)
+//        sign publishing.publications.release
+//    }
+}
+
+apply from: 'build-library.gradle'

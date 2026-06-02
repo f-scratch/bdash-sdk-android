@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+
+    <!-- merge target -->
+    <application>
+        <activity android:name="com.f_scratch.bdash.mobile.analytics.notification.BDashPopupActivity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
+            android:theme="@style/BDashSDK_PopupNotification"
+        />
+
+    </application>
+
+
+</manifest>
