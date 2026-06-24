@@ -24,9 +24,11 @@
 -keep class androidx.** { *; } 
 -keep class com.google.android.gms.** { *; }
 
--keep class com.f_scratch.bdash.mobile.analytics.** { *; }
+-keep class com.smart_bdash.mobile.analytics.** { *; }
 
 
 -printconfiguration build/full-r8-config.txt
 -printusage build/usage.txt
 -printmapping build/mapping.txt
+
+-assumenosideeffects class com.smart_bdash.mobile.analytics.TrackerDebug { *; }

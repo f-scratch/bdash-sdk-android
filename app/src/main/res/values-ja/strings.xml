@@ -2,19 +2,19 @@
 
 
     <!-- 以下を bdash-sdk で採用する. 日本語/英語両方とも必要-->
-    <string name="com_f_scratch_bdash_mobile_notification_sound">サウンドを再生</string>
-    <string name="com_f_scratch_bdash_mobile_notification_vib">バイブレーション</string>
+    <string name="com_smart_bdash_mobile_notification_sound">サウンドを再生</string>
+    <string name="com_smart_bdash_mobile_notification_vib">バイブレーション</string>
 
-    <string name="com_f_scratch_bdash_mobile_notification_h1_01">通知受信の設定</string>
-    <string name="com_f_scratch_bdash_mobile_notification_h1_02">通知受信したときの動作</string>
+    <string name="com_smart_bdash_mobile_notification_h1_01">通知受信の設定</string>
+    <string name="com_smart_bdash_mobile_notification_h1_02">通知受信したときの動作</string>
 
-    <string name="com_f_scratch_bdash_mobile_notification_popup_settings_title">割り込み通知設定</string>
+    <string name="com_smart_bdash_mobile_notification_popup_settings_title">割り込み通知設定</string>
 
-    <string name="com_f_scratch_bdash_mobile_notification_popup_settings_h1_01">UI設定</string>
+    <string name="com_smart_bdash_mobile_notification_popup_settings_h1_01">UI設定</string>
 
-    <string name="com_f_scratch_bdash_mobile_popup_close">閉じる</string>
-    <string name="com_f_scratch_bdash_mobile_popup_show">表示</string>
+    <string name="com_smart_bdash_mobile_popup_close">閉じる</string>
+    <string name="com_smart_bdash_mobile_popup_show">表示</string>
 
-    <string name="com_f_scratch_bdash_mobile_command_copied">\nコピーしました。</string>
+    <string name="com_smart_bdash_mobile_command_copied">\nコピーしました。</string>
 
 </resources>

@@ -62,15 +62,15 @@
 
 <!-- ############## プッシュ通知のダイアログカラー ################# -->
     <style name="BDashSDK_PopupTheme_black" parent="Base.Widget.AppCompat.Button" tools:keep="@style/BDashSDK_PopupTheme_black">
-        <item name="bdash_showButton">@drawable/com_f_scratch_bdash_mobile_notification_draw_button_01_yes</item>
-        <item name="bdash_closeButton">@drawable/com_f_scratch_bdash_mobile_notification_draw_button_01_no</item>
-        <item name="bdash_headerBackground">@drawable/com_f_scratch_bdash_mobile_notification_draw_layout_frame_black</item>
+        <item name="bdash_showButton">@drawable/com_smart_bdash_mobile_notification_draw_button_01_yes</item>
+        <item name="bdash_closeButton">@drawable/com_smart_bdash_mobile_notification_draw_button_01_no</item>
+        <item name="bdash_headerBackground">@drawable/com_smart_bdash_mobile_notification_draw_layout_frame_black</item>
         <item name="bdash_headerTextColor">#ffffff</item>
     </style>
     <style name="BDashSDK_PopupTheme_white" parent="Base.Widget.AppCompat.Button">
-        <item name="bdash_showButton">@drawable/com_f_scratch_bdash_mobile_notification_draw_button_01_yes</item>
-        <item name="bdash_closeButton">@drawable/com_f_scratch_bdash_mobile_notification_draw_button_01_no</item>
-        <item name="bdash_headerBackground">@drawable/com_f_scratch_bdash_mobile_notification_draw_layout_frame_white</item>
+        <item name="bdash_showButton">@drawable/com_smart_bdash_mobile_notification_draw_button_01_yes</item>
+        <item name="bdash_closeButton">@drawable/com_smart_bdash_mobile_notification_draw_button_01_no</item>
+        <item name="bdash_headerBackground">@drawable/com_smart_bdash_mobile_notification_draw_layout_frame_white</item>
         <item name="bdash_headerTextColor">#000000</item>
     </style>
 <!-- ############## ここまで ################# -->

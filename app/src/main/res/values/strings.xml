@@ -1,22 +1,22 @@
 <resources>
 
     <!-- English only. System error -->
-    <string name="com_f_scratch_bdash_mobile_notification_fcm_error" translatable="false">FCM service error.</string>
+    <string name="com_smart_bdash_mobile_notification_fcm_error" translatable="false">FCM service error.</string>
 
     <!-- 以下を bdash-sdk で採用する. 日本語/英語両方とも必要-->
-    <string name="com_f_scratch_bdash_mobile_notification_sound">Sound</string>
-    <string name="com_f_scratch_bdash_mobile_notification_vib">Vibration</string>
+    <string name="com_smart_bdash_mobile_notification_sound">Sound</string>
+    <string name="com_smart_bdash_mobile_notification_vib">Vibration</string>
 
-    <string name="com_f_scratch_bdash_mobile_notification_h1_01">Receive settings</string>
-    <string name="com_f_scratch_bdash_mobile_notification_h1_02">Receive action</string>
+    <string name="com_smart_bdash_mobile_notification_h1_01">Receive settings</string>
+    <string name="com_smart_bdash_mobile_notification_h1_02">Receive action</string>
 
-    <string name="com_f_scratch_bdash_mobile_notification_popup_settings_title">Setting Popup Notification</string>
+    <string name="com_smart_bdash_mobile_notification_popup_settings_title">Setting Popup Notification</string>
 
-    <string name="com_f_scratch_bdash_mobile_notification_popup_settings_h1_01">UI Settings</string>
+    <string name="com_smart_bdash_mobile_notification_popup_settings_h1_01">UI Settings</string>
 
-    <string name="com_f_scratch_bdash_mobile_popup_close">Close</string>
-    <string name="com_f_scratch_bdash_mobile_popup_show">Show</string>
+    <string name="com_smart_bdash_mobile_popup_close">Close</string>
+    <string name="com_smart_bdash_mobile_popup_show">Show</string>
 
-    <string name="com_f_scratch_bdash_mobile_command_copied">\ncopied.</string>
+    <string name="com_smart_bdash_mobile_command_copied">\ncopied.</string>
 
 </resources>

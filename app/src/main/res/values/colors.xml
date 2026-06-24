@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="com_f_scratch_bdash_mobile_dialog_button">#6002EE</color>
-    <color name="com_f_scratch_bdash_mobile_dialog_title">#DE000000</color>
-    <color name="com_f_scratch_bdash_mobile_dialog_message">#99000000</color>
+    <color name="com_smart_bdash_mobile_dialog_button">#6002EE</color>
+    <color name="com_smart_bdash_mobile_dialog_title">#DE000000</color>
+    <color name="com_smart_bdash_mobile_dialog_message">#99000000</color>
 </resources>
