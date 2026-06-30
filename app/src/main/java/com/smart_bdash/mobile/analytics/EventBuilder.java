@@ -7,7 +7,7 @@ import java.util.HashMap;
 /**
  * イベントビューを生成するビルダー
  *
- * @author FromScratch
+ * @author dataX
  */
 public class EventBuilder extends AbstractBuilder{
 

@@ -27,7 +27,7 @@ import java.util.HashMap;
  * ・各種データログのトラッキングは本クラスで行います。<br>
  * ・プッシュ通知は {@link com.smart_bdash.mobile.analytics.notification.BDashNotification BDashNotification} を参照してください。<br>
  *
- * @author FromScratch
+ * @author dataX
  */
 public class Tracker {
 
@@ -138,7 +138,8 @@ public class Tracker {
         BootValue bootValue = new BootValue(dId, bdId);
         String bootValueJson = new Gson().toJson(bootValue);
         tracker.setBootType(BootType.BOOT_PUSH, bootValueJson);
-        LogUtil.s("setBootType bootValue:" + bootValueJson);
+        // dId/bdId 等の識別子を含むため、秘匿キーをマスクして出力する
+        LogUtil.s("setBootType bootValue:" + LogUtil.maskJson(bootValueJson));
 
         return tracker;
     }

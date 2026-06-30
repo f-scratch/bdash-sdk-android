@@ -22,9 +22,9 @@ import java.nio.charset.StandardCharsets;
  */
 public class StorageUtil {
 
-    private static final String APP_PREFERENCE_NAME = "com.fsbdash.mobile.analytics.storage";
+    private static final String APP_PREFERENCE_NAME = "com.smart_bdash.mobile.analytics.storage";
     private static String ROOT        = "";
-    private static final String LOCAL_DIR   = "com.fsbdash.mobile.analytics.ser/";
+    private static final String LOCAL_DIR   = "com.smart_bdash.mobile.analytics.ser/";
 
     /**
      * 保存・復元に使用する Gson インスタンス.<br>
@@ -122,6 +122,15 @@ public class StorageUtil {
         }
     }
 
+    /**
+     * 受け取ったオブジェクトを JSON 化して保存する.
+     * 呼び出し元で同一ファイルタイプへの並行アクセスが発生しないことが保証される場合にのみ使用すること
+     * 並行アクセスの可能性がある場合は serialize() を使用すること
+     * @param type
+     * @param obj
+     * @param <T>
+     * @throws Exception
+     */
     public static <T> void serialize_nowait(FileType type, T obj) throws Exception {
         FileOutputStream target = null;
         Writer out  = null;

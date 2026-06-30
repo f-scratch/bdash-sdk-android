@@ -32,7 +32,7 @@ public class SDKConfig {
     public static final String APP_BDASH_FCM_PAYLOAD_KEY_CUSTOM_PAYLOAD = "custom_payload";
     public static final String APP_BDASH_FCM_PAYLOAD_KEY_DID = "dId";
     public static final String APP_BDASH_FCM_PAYLOAD_KEY_BDID = "bdId";
-    public static final String APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_FSCRATCH = "jp_co_fscratch";
+    public static final String APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_DATAX = "jp_co_fscratch";
     public static final String APP_BDASH_FCM_PAYLOAD_KEY_FCM_API = "fcm_api";
     public static final String APP_BDASH_FCM_PAYLOAD_KEY_IMAGE = "gcm.notification.image";
     public static final String APP_BDASH_FCM_PAYLOAD_KEY_NOTIFICATION_TYPE_ANDROID = "notification_type_android";

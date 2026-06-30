@@ -7,7 +7,7 @@ import java.util.HashMap;
 /**
  * 例外ビューを生成するビルダー
  *
- * @author FromScratch
+ * @author dataX
  */
 public class ExceptionBuilder extends AbstractBuilder {
 

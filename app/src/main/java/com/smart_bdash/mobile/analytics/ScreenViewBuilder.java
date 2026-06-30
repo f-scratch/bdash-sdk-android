@@ -7,7 +7,7 @@ import java.util.HashMap;
 /**
  * 画面ビューを生成するビルダー
  *
- * @author FromScratch
+ * @author dataX
  */
 public class ScreenViewBuilder extends AbstractBuilder {
 

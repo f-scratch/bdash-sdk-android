@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
@@ -17,7 +16,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,6 +33,7 @@ import android.widget.TextView;
 import com.smart_bdash.mobile.analytics.R;
 import com.smart_bdash.mobile.analytics.util.LogUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import static com.smart_bdash.mobile.analytics.R.style.BDashSDK_PopupTheme_white;
@@ -61,9 +60,6 @@ public class BDashPopupActivity extends Activity {
 
     /** Cache ディレクトリに作成するキャッシュファイル名. 他のアプリと衝突しない名前にする*/
     private final static String CACHE_NAME = "com.smart_bdash.mobile.analytics.cache";
-
-    private final static String PREFERENCE_NAME        = "com.smart_bdash.mobile.analytics.notification";
-    private final static String POPUP_BITMAP = "popupBitmap";
 
     private final static int MESSAGE_MAX_LINES_WITH_IMAGE = 15;
 
@@ -289,7 +285,7 @@ public class BDashPopupActivity extends Activity {
                         if( isDestroy )return;
                         Bitmap work = null;
                         synchronized (managedBitmap) {
-                            work = readBitmapFromSharedPreference();
+                            work = readBitmapFromCache();
                             if( work != null ) {
                                 if( isDestroy ){
                                     work.recycle();
@@ -408,6 +404,7 @@ public class BDashPopupActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        deleteCacheFile();
 
         isDestroy = true;
         imageView.setImageDrawable(null);
@@ -509,20 +506,26 @@ public class BDashPopupActivity extends Activity {
         return anim;
     }
 
-    private SharedPreferences getPreferences() {
-        return getApplicationContext().getSharedPreferences(PREFERENCE_NAME,
-                Context.MODE_PRIVATE);
+    private Bitmap readBitmapFromCache() {
+        Bitmap bitmap = null;
+        File cacheFile = new File(this.getCacheDir(), CACHE_NAME);
+
+        // キャッシュされたファイルが存在しない場合、nullを返却
+        if (!cacheFile.exists()) {
+            return null;
+        }
+
+        bitmap = BitmapFactory.decodeFile(cacheFile.getAbsolutePath());
+
+        deleteCacheFile();
+        return bitmap;
     }
 
-    private Bitmap readBitmapFromSharedPreference() {
-        final SharedPreferences prefs = getPreferences();
-        String bitmapString = prefs.getString(POPUP_BITMAP, "");
-        if (!bitmapString.equals("")) {
-            byte[] b = Base64.decode(bitmapString, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(b, 0, b.length).copy(Bitmap.Config.ARGB_8888, true);
-            prefs.edit().remove(POPUP_BITMAP).commit();
-            return bitmap;
+    private void deleteCacheFile() {
+        File cacheFile = new File(this.getCacheDir(), CACHE_NAME);
+
+        if (cacheFile.exists()) {
+            cacheFile.delete();
         }
-        return null;
     }
 }

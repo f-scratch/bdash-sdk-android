@@ -10,7 +10,10 @@ import org.json.JSONObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *　Push通知メッセージクラス
@@ -34,6 +37,28 @@ public class NotificationMessage {
     public int      id; //b->dashサーバーで配信時に採番している配信ID
     public ArrayList<NotificationButton> buttons = new ArrayList<>();
 
+    /**
+     * ログ出力時に本文を伏せるべき秘匿フィールド。
+     * ペイロード本文やボタン定義 JSON、識別子は秘匿情報を含みうるため値を出さない。
+     */
+    private static final Set<String> SENSITIVE_FIELDS = new HashSet<>(Arrays.asList(
+            "custom_payload", "buttons", "dId", "bdId", "param", "notification_param"
+    ));
+
+    /**
+     * ログ出力用にフィールド値をマスクする。
+     * 秘匿フィールドは値を出さず文字数のみ（{@code "(N chars)"}）にし、それ以外はそのまま返す。
+     * @param name フィールド名
+     * @param value フィールド値
+     * @return ログ出力用の文字列
+     */
+    private static String maskFieldValue(String name, String value) {
+        if (SENSITIVE_FIELDS.contains(name)) {
+            return LogUtil.maskData(value);
+        }
+        return value;
+    }
+
     public static NotificationMessage decode( Map<String,String> data ) {
         NotificationMessage result = new NotificationMessage();
         Field fieldList[] = NotificationMessage.class.getDeclaredFields();
@@ -50,7 +75,7 @@ public class NotificationMessage {
                     // 専用機構のため定数を使用
                     final String keyButtons = "buttons";
 
-                    LogUtil.s( String.format(">>set(%s): %s=%s",field.getType(),name,value) );
+                    LogUtil.s( String.format(">>set(%s): %s=%s",field.getType(),name,maskFieldValue(name,value)) );
                     if( field.getType() == Integer.class || field.getType() == int.class){
                         field.set(result, Integer.parseInt(value));
                     } else if ( field.getType() == String.class ) {
@@ -83,7 +108,7 @@ public class NotificationMessage {
                     if( json.isNull(name) )continue;
                     String value= json.getString(name);
 
-                    LogUtil.s( String.format(">>set(%s): %s=%s",field.getType(),name,value) );
+                    LogUtil.s( String.format(">>set(%s): %s=%s",field.getType(),name,maskFieldValue(name,value)) );
                     if( field.getType() == Integer.class || field.getType() == int.class){
                         field.set(result, Integer.parseInt(value));
                     } else if ( field.getType() == String.class ) {
@@ -112,7 +137,7 @@ public class NotificationMessage {
                     if( json.isNull(name) )continue;
                     String value= json.getString(name);
 
-                    LogUtil.s( String.format(">>set(%s): %s=%s",field.getType(),name,value) );
+                    LogUtil.s( String.format(">>set(%s): %s=%s",field.getType(),name,maskFieldValue(name,value)) );
                     if( field.getType() == Integer.class || field.getType() == int.class){
                         field.set(result, Integer.parseInt(value));
                     } else if ( field.getType() == String.class ) {

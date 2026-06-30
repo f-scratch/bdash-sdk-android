@@ -30,5 +30,3 @@
 -printconfiguration build/full-r8-config.txt
 -printusage build/usage.txt
 -printmapping build/mapping.txt
-
--assumenosideeffects class com.smart_bdash.mobile.analytics.TrackerDebug { *; }

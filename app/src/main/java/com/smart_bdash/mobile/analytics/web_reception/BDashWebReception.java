@@ -81,7 +81,7 @@ import okhttp3.Response;
 /**
  * B-Dash のアプリ接客をコントロールするクラス<br>
  *
- * @author fscratch on 2018/09/06.
+ * @author dataX on 2018/09/06.
  */
 
 public class BDashWebReception extends DialogFragment {
@@ -121,8 +121,6 @@ public class BDashWebReception extends DialogFragment {
     private final static String COMMAND_SEPARATOR = "/"; // 区切り文字
     private final static String COMMAND_CLOSE = "close"; // 閉じる
     private final static String COMMAND_COPY  = "copy";  // コピー
-
-    private final static int VERSION_BEFORE_CLOSE_BUTTON_ADJUSTMENT = 612;  // 閉じるボタン可変対応直前のSDKバージョン(ver 6.1.2)
 
     /**
      * Web接客で発生したイベントを受け取るリスナーのインターフェイス
@@ -338,14 +336,16 @@ public class BDashWebReception extends DialogFragment {
             // 取得しに行った URL 以外で http エラーが発生したとき
             if( !request.getUrl().toString().equals(current_webReception.getCurrent().getUrl()) ) {
                 LogUtil.s( "onReceivedHttpError: " + errorResponse.getStatusCode());
-                LogUtil.s("url: " + request.getUrl());
+                // URL のクエリ・フラグメントに秘匿パラメータが乗りうるため、host + path のみ出力する
+                LogUtil.s("url: " + LogUtil.maskUrl(request.getUrl().toString()));
                 return ;
             }
 
             if( !request.getUrl().toString().endsWith(FAVICON_PATH) ) {
                 LogUtil.s("################################" );
                 LogUtil.s("onReceivedHttpError: " + errorResponse.getStatusCode());
-                LogUtil.s("url: " + request.getUrl());
+                // URL のクエリ・フラグメントに秘匿パラメータが乗りうるため、host + path のみ出力する
+                LogUtil.s("url: " + LogUtil.maskUrl(request.getUrl().toString()));
 
                 // ステータスコードエラーの場合 WebView を表示しない
                 onConnect_WebViewStatusCodeError();
@@ -624,7 +624,8 @@ public class BDashWebReception extends DialogFragment {
      */
     private void onResponse_WebReceptionAPI( BDashReport report, String response ){
         try {
-            LogUtil.s(">> webReception response: " + response);
+            // レスポンス本文は秘匿情報を含みうるため、文字数のみ出力する
+            LogUtil.s(">> webReception response: " + LogUtil.maskData(response));
 
             Gson gson = BDashWebReceptionUtil.getDefaultGson();
             WebReceptionSettingsResponse current = gson.fromJson(response, WebReceptionSettingsResponse.class);
@@ -736,15 +737,18 @@ public class BDashWebReception extends DialogFragment {
             type = ConnectType.DEBUG_API;
             param.setConcatUrl(report.debugConnectUrl);
             LogUtil.s(">>> 検証用の URL が指定されました>>>>>>>>>>>>>>>>>>>>>>");
-            LogUtil.s( report.debugConnectUrl );
+            // URL のクエリ・フラグメントに秘匿パラメータが乗りうるため、host + path のみ出力する
+            LogUtil.s( LogUtil.maskUrl(report.debugConnectUrl) );
         }
 
         ConnectClientController controller;
         if( webReception!=null ){
-            webReception.printConsole(request);
+            // リクエストボディは識別子等を含むため、秘匿キーをマスクして出力する
+            webReception.printConsole(LogUtil.maskJson(request));
             controller = webReception.getConnectController();
         }else{
-            LogUtil.s(request);
+            // リクエストボディは識別子等を含むため、秘匿キーをマスクして出力する
+            LogUtil.s(LogUtil.maskJson(request));
             controller = new ConnectClientController();
         }
 
@@ -771,7 +775,8 @@ public class BDashWebReception extends DialogFragment {
                 } else {
                     LogUtil.s("status: " + connectClient.getResponseCode() );
                     if( throwable == null ) {
-                        LogUtil.s(connectClient.getResponse() );
+                        // レスポンス本文は秘匿情報を含みうるため、文字数のみ出力する
+                        LogUtil.s(LogUtil.maskData(connectClient.getResponse()) );
                     } else{
                         LogUtil.s( throwable.toString() );
                     }
@@ -840,7 +845,7 @@ public class BDashWebReception extends DialogFragment {
             // HWアクセラレーターをオフにした上で透過設定にする
             webView.setBackgroundColor(0x0);
 
-            if (isCloseButtonAdjustment()) {
+            if (current.validateCloseButton()) {
                 HashMap<String, Integer> closeButtonInfo = getCloseButtonInfo(current, metrics);
 
                 int closeButtonHeight = closeButtonInfo.get(KEY_CLOSE_BUTTON_HEIGHT);
@@ -912,7 +917,7 @@ public class BDashWebReception extends DialogFragment {
             lp = (FrameLayout.LayoutParams) webViewFrame.getLayoutParams();
             LogUtil.s( String.format("webViewFrame  w=%d h=%d", webViewFrame.getWidth(), webViewFrame.getHeight()));
             lp.width = webView_width;
-            if (isCloseButtonAdjustment()) {
+            if (current.validateCloseButton()) {
                 lp.height = viewHeight - (paddingTopSize + paddingBottomSize);
             } else {
                 lp.height = viewHeight;
@@ -937,7 +942,7 @@ public class BDashWebReception extends DialogFragment {
                 } else {
                     if( i==0 ) {
                         // 先頭
-                        if (isCloseButtonAdjustment()) {
+                        if (current.validateCloseButton()) {
                             mlp.height = 0;
                         } else {
                             mlp.height = paddingTopSize;
@@ -955,7 +960,8 @@ public class BDashWebReception extends DialogFragment {
                     WebViewRequest req = new WebViewRequest();
                     req.copy(current_report);
                     String postData = BDashWebReceptionUtil.getDefaultGson().toJson(req);
-                    LogUtil.s(">> postData: " + postData);
+                    // リクエストボディは識別子等を含むため、秘匿キーをマスクして出力する
+                    LogUtil.s(">> postData: " + LogUtil.maskJson(postData));
 
                     if( current.forceShow==null ) {
                         LogUtil.s(">> POST Request");
@@ -1021,7 +1027,8 @@ public class BDashWebReception extends DialogFragment {
         } else {
             LogUtil.s(">> getWebViewContent Url does not have /v2/");
             postData = BDashWebReceptionUtil.URLEncode(postData);
-            LogUtil.s(">> postData(encode): " + postData);
+            // URLエンコード後は秘匿情報を含みうるため、文字数のみ出力する
+            LogUtil.s(">> postData(encode): " + LogUtil.maskData(postData));
 
             webView.postUrl(url, postData.getBytes());
         }
@@ -1134,7 +1141,8 @@ public class BDashWebReception extends DialogFragment {
      */
     void adjustDialogMarginWhenCenter(){
         LogUtil.s(">> Adjust when the popup is created.");
-        if (!isCloseButtonAdjustment()) {
+        WebReceptionSettings current = current_webReception.getCurrent();
+        if (!current.validateCloseButton()) {
             if (paddingTopSize == 0 || paddingRightSize == 0) {
                 // 閉じるボタンのサイズが取得できていない場合は戻る
                 LogUtil.s(">>  not adjustable button return!");
@@ -1149,7 +1157,6 @@ public class BDashWebReception extends DialogFragment {
             }
         }
 
-        WebReceptionSettings current = current_webReception.getCurrent();
         if(current.getHorizontalAlign() != Gravity.CENTER_HORIZONTAL && current.getVerticalAlign() != Gravity.CENTER_VERTICAL){
             //horizontalとverticalのどちらもcenter扱いでない場合は戻る
             return;
@@ -1673,7 +1680,7 @@ public class BDashWebReception extends DialogFragment {
         WebReceptionSettings closeButtonSettings = current_webReception.getCurrent();
         String closeButtonSrc = closeButtonSettings.getCloseButtonSrc();
         LogUtil.s(">>  close button src: " + closeButtonSrc);
-        if (closeButtonSrc != null && isCloseButtonAdjustment()) {
+        if (closeButtonSrc != null && closeButtonSettings.validateCloseButton()) {
             // デフォルトの閉じるボタンを描画しない場合、新たに閉じるボタンをサーバーから取得＆描画する
             setButtonSrcToImageView(closeButtonView, closeButtonSrc);
         }
@@ -1904,29 +1911,13 @@ public class BDashWebReception extends DialogFragment {
     }
 
     /**
-     * 閉じるボタンが変更可能か判定
-     *  以下の2点で判定
-     *  - SDKのバージョン(ver 6.1.2以降のバージョンかどうか)
-     *  - 閉じるボタンのサイズ(表示不可なサイズ(0dp)かどうか)
-     * @return true: 変更可能、false: 変更不可
-     */
-    private boolean isCloseButtonAdjustment() {
-        String nowVersionStr = SDKConfig.SDK_VERSION;
-        int nowVersion = Integer.parseInt(nowVersionStr.replace(".", ""));
-
-        boolean displayAdjustableCloseButton = current_webReception.getCurrent().validateCloseButton();
-
-        return displayAdjustableCloseButton && nowVersion > VERSION_BEFORE_CLOSE_BUTTON_ADJUSTMENT;
-    }
-
-    /**
      * 閉じるボタンの取得
      * @param rootView
      * @return
      */
     private ImageView getCloseButtonView(View rootView) {
         ImageView closeButton;
-        if (isCloseButtonAdjustment()) {
+        if (current_webReception.getCurrent().validateCloseButton()) {
             LogUtil.s(">>  close button can adjustment.");
             closeButton = rootView.findViewById(R.id.com_smart_bdash_mobile_reception_closeButton_adjustable);
         } else {

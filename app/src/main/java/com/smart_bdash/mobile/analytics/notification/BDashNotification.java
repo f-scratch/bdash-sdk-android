@@ -48,7 +48,8 @@ import com.smart_bdash.mobile.analytics.util.LogUtil;
 import com.smart_bdash.mobile.analytics.util.LogicUtil;
 import com.google.gson.Gson;
 
-import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,7 +80,6 @@ public class BDashNotification {
     private final static String PROPERTY_APP_VERSION   = "version";
     private final static String PROPERTY_POPUP_USE_SOUND = "popupUseSound";
     private final static String PROPERTY_POPUP_USE_VIBRATION = "popupUseVib";
-    private final static String POPUP_BITMAP = "popupBitmap";
 
     private final static String TYPE_DIALOG = "dialog";
 
@@ -96,7 +96,7 @@ public class BDashNotification {
     public final static String LAUNCH_CUSTOM_PAYLOAD = "bdash_launch_custom_payload";
     public final static String LAUNCH_DID = "bdash_launch_did";
     public final static String LAUNCH_BDID = "bdash_launch_bdid";
-    public final static String LAUNCH_JP_CO_FSCRATCH = "bdash_launch_jp_co_fscratch";
+    public final static String LAUNCH_JP_CO_DATAX = "bdash_launch_jp_co_datax";
     public final static String LAUNCH_IMAGE = "bdash_launch_image";
     public final static String LAUNCH_TYPE  = "bdash_launch_type";
 
@@ -110,6 +110,8 @@ public class BDashNotification {
 
     /** プッシュ通知からアプリを起動したかどうかを取得するキー名 */
     public final static String LAUNCH_NOTIFICATION = "bdash_launch_notification";
+
+    private final static String CACHE_NAME = "com.smart_bdash.mobile.analytics.cache";
 
     /* register/cancel の最後に呼ばれる処理 */
     private final Runnable processEnd = new Runnable() {
@@ -416,8 +418,8 @@ public class BDashNotification {
                 bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_DID));
         data.put(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_BDID,
                 bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_BDID));
-        data.put(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_FSCRATCH,
-                bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_FSCRATCH));
+        data.put(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_DATAX,
+                bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_DATAX));
         data.put(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_FCM_API,
                 bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_FCM_API));
         data.put(SDKConfig.APP_BDASH_NOTIFICATION_IMAGE,
@@ -449,8 +451,8 @@ public class BDashNotification {
                 bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_ID));
         data.put(SDKConfig.APP_BDASH_NOTIFICATION_IMAGE,
                 bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_MEDIA_URL));
-        data.put(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_FSCRATCH,
-                bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_FSCRATCH));
+        data.put(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_DATAX,
+                bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_JP_CO_DATAX));
         data.put(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_NOTIFICATION_PARAM,
                 bundle.getString(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_NOTIFICATION_PARAM));
         data.put(SDKConfig.APP_BDASH_FCM_PAYLOAD_KEY_BUTTONS,
@@ -825,7 +827,8 @@ public class BDashNotification {
         token.notificationId = notificationId;
         try {
             String request = LogicUtil.createJsonRequestByJsonToken(token);
-            LogUtil.s(request);
+            // FCMトークン(notificationId)等を含むため、秘匿キーをマスクして出力する
+            LogUtil.s(LogUtil.maskJson(request));
 
 
             IConnectClientController con = connectControllerCreator.create();
@@ -844,7 +847,8 @@ public class BDashNotification {
                         LogUtil.s("code: " + client.getResponseCode());
                     }
                     LogUtil.s(">>response");
-                    LogUtil.s(client.getResponse());
+                    // レスポンス本文は秘匿情報を含みうるため、文字数のみ出力する
+                    LogUtil.s(LogUtil.maskData(client.getResponse()));
                 }
             }, ConnectType.API_TOKEN_POST, request);
             con.waitConnect();
@@ -1258,7 +1262,7 @@ public class BDashNotification {
                 try {
                     Bitmap bitmap = DownloadClient.downloadAndConvertToRichImage(message.image);
                     if (bitmap != null) {
-                        writeBitmapToSharedPreferences(context, bitmap);
+                        writeBitmapToCache(context, bitmap);
                     } else {
                         throw new Exception( "image error");
                     }
@@ -1308,7 +1312,7 @@ public class BDashNotification {
         intent.putExtra(LAUNCH_CUSTOM_PAYLOAD, message.custom_payload);
         intent.putExtra(LAUNCH_DID, message.dId);
         intent.putExtra(LAUNCH_BDID, message.bdId);
-        intent.putExtra(LAUNCH_JP_CO_FSCRATCH, message.jp_co_fscratch);
+        intent.putExtra(LAUNCH_JP_CO_DATAX, message.jp_co_fscratch);
         intent.putExtra(LAUNCH_IMAGE, message.image);
         intent.putExtra(LAUNCH_TYPE, message.notification_type_android);
         intent.putExtra(LAUNCH_NOTIFICATION, 1);
@@ -1392,20 +1396,30 @@ public class BDashNotification {
     }
 
     /**
-     * SharedPreferenceへ画像データを保存
+     * 一時保存用ファイルへ画像データを保存
      * @param context
      * @param bitmap
      */
-    private void writeBitmapToSharedPreferences(Context context, Bitmap bitmap) {
+    private void writeBitmapToCache(Context context, Bitmap bitmap) {
+        File cacheFile = new File(context.getCacheDir(), CACHE_NAME);
+
+        FileOutputStream fos = null;
         try {
-            final SharedPreferences prefs = getPreferences(context);
-            SharedPreferences.Editor editor = prefs.edit();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-            String bitmapStr = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
-            editor.putString(POPUP_BITMAP, bitmapStr).commit();
-        } catch(Exception e) {
+            fos = new FileOutputStream(cacheFile);
+
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+            fos.flush();
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

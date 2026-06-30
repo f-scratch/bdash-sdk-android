@@ -8,7 +8,7 @@ import com.smart_bdash.mobile.analytics.model.JsonEventModel;
  * @see EventBuilder
  * @see ExceptionBuilder
  *
- * @author from scratch
+ * @author dataX
  */
 class AbstractBuilder {
     protected JsonEventModel jsonObj = new JsonEventModel();

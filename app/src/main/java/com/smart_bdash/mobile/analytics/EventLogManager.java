@@ -13,7 +13,7 @@ import java.util.HashMap;
  *  ・本クラスは内部実装用クラスです。<br>
  *  ・イベントログデータを管理します。
  *
- * @author FromScratch
+ * @author dataX
  */
 class EventLogManager {
 

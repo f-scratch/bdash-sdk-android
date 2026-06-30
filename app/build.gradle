@@ -1,16 +1,10 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+
 plugins {
     id 'com.android.library'
-    id 'maven-publish'
-    id 'signing'
+    id 'com.vanniktech.maven.publish'
 }
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withInputStream {stream ->
-        localProperties.load(stream)
-    }
-}
 
 android {
 
@@ -52,14 +46,6 @@ android {
         buildConfig = true
     }
 
-    // Maven Central は sources JAR と javadoc JAR の両方を必須とする
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
-
     namespace 'com.smart_bdash.mobile.analytics'
 }
 
@@ -86,71 +72,13 @@ dependencies {
 
 }
 
-// ----------------------------------------------------------------------------
-// Maven Central publishing（標準 maven-publish + signing プラグイン）
-//
-// 認証情報・署名鍵は gradle.properties にはコミットせず、local.properties か
-// 環境変数で渡す:
-//   signingKey / signingPassword … GPG 秘密鍵(ASCII armored)とパスフレーズ
-//
-// 成果物の生成:
-//   ./gradlew publishToMavenLocal                  … ローカル(~/.m2)に署名つきで生成
-//   ./gradlew publishReleasePublicationToMavenLocal
-//
-// Central Portal (central.sonatype.com) へは、生成した成果物を手動で
-// アップロード（"Publish Component"）するか、別途バンドルを作成して投入する。
-// 旧 OSSRH (s01.oss.sonatype.org) は 2025-06 でサービス終了済みのため使用しない。
-// ----------------------------------------------------------------------------
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-
-                groupId = project.findProperty('GROUP')
-                artifactId = project.findProperty('ARTIFACT_ID')
-                version = project.findProperty('VERSION_NAME')
-
-                pom {
-                    name = project.findProperty('POM_NAME')
-                    description = project.findProperty('POM_DESCRIPTION')
-                    url = project.findProperty('POM_URL')
-                    inceptionYear = project.findProperty('POM_INCEPTION_YEAR')
-
-                    licenses {
-                        license {
-                            name = project.findProperty('POM_LICENSE_NAME')
-                            url = project.findProperty('POM_LICENSE_URL')
-                            distribution = project.findProperty('POM_LICENSE_DIST')
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id = project.findProperty('POM_DEVELOPER_ID')
-                            name = project.findProperty('POM_DEVELOPER_NAME')
-                            url = project.findProperty('POM_DEVELOPER_URL')
-                        }
-                    }
-
-                    scm {
-                        connection = project.findProperty('POM_SCM_CONNECTION')
-                        developerConnection = project.findProperty('POM_SCM_DEV_CONNECTION')
-                        url = project.findProperty('POM_SCM_URL')
-                    }
-                }
-            }
-        }
-    }
-
-    signing {
-        // 署名鍵は local.properties / 環境変数 / ~/.gradle/gradle.properties のいずれかから取得する。
-        // ~/.gradle/gradle.properties に signingInMemoryKey 形式で置く運用も許容する。
-        def signingKey = localProperties['signingKey'] ?: System.getenv('SIGNING_KEY') ?: project.findProperty('signingInMemoryKey')
-        def signingPassword = localProperties['signingPassword'] ?: System.getenv('SIGNING_PASSWORD') ?: project.findProperty('signingInMemoryKeyPassword')
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign publishing.publications.release
-    }
+// Maven Central publishing。座標と POM は gradle.properties から自動読込。
+// 認証/署名鍵は環境変数 ORG_GRADLE_PROJECT_mavenCentralUsername/Password,
+// signingInMemoryKey/Password で渡す。
+mavenPublishing {
+    publishToMavenCentral(true)
+    signAllPublications()
+    configure(new AndroidSingleVariantLibrary("release", true, true))
 }
 
 apply from: 'build-library.gradle'
