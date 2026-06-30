@@ -72,10 +72,14 @@ dependencies {
 
 }
 
-// Maven Central publishing。座標と POM は gradle.properties から自動読込。
+// Maven Central publishing。POM メタデータ(POM_*)は gradle.properties から自動読込。
+// 座標のうち groupId/version は GROUP/VERSION_NAME から自動で読まれるが、
+// artifactId だけは自動読込されず Gradle モジュール名(app)が使われてしまうため、
+// coordinates() で GROUP/ARTIFACT_ID/VERSION_NAME を明示的に指定する。
 // 認証/署名鍵は環境変数 ORG_GRADLE_PROJECT_mavenCentralUsername/Password,
 // signingInMemoryKey/Password で渡す。
 mavenPublishing {
+    coordinates(GROUP, ARTIFACT_ID, VERSION_NAME)
     publishToMavenCentral(true)
     signAllPublications()
     configure(new AndroidSingleVariantLibrary("release", true, true))
