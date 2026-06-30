@@ -17,10 +17,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # 公開リポジトリには Gradle Wrapper を含めないため、Gradle 本体を用意する。
+      # Wrapper の gradle-wrapper.properties に合わせた Gradle 8.6 を使用する。
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.6'
 
       - name: Publish and release to Maven Central
-        run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
+        run: gradle publishAndReleaseToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
