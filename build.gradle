@@ -2,8 +2,8 @@
 buildscript {
 
     ext {
-        sdkVersion = "6.4.1"        // 現行の SDK バージョン
-        releaseSdkVersion = "6.4.1" // 次リリースする SDK バージョン
+        sdkVersion = "7.0.0"        // 現行の SDK バージョン
+        releaseSdkVersion = "7.0.0" // 次リリースする SDK バージョン
     }
 
     ext {

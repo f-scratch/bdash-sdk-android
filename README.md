@@ -1,29 +1,29 @@
->Last Update
->2020/01/16
+# bdash-sdk-android
 
-# mario-mobile-sdk-android
-Repository for `Bdash mobile sdk for android`
+b→dash Mobile SDK is an extension library for mobile applications that enables user behavior tracking and push notifications.
+This repository contains the source code for the Android implementation of the b→dash Mobile SDK.
 
+
+## Getting Started
+
+Please refer to our documentation for detailed instructions on adding the b→dash mobile SDK to your Android Studio project.
+
+
+## Requirements
 
 This application requires:
 
-    Android Stduio 3.4.x 以上
-    JDK 1.8
-    Android API 26 以上
+    Android Stduio Graffe or higher
+    Open JDK・JDK 8 or higher
+    Android Gradle Plugin 8.4.0 or higher
+    minSdkVersion 24 or higher
 
 
-## Documents
+## Author
+
+dataX, Inc.
 
 
-* [アプリ接客](https://docs.google.com/presentation/d/1wvTpmQnkcYWHiuYG8VYG58CFLPdzVT_sveoSA9zj2gM/edit#slide=id.p)
+## License
 
-* [Mobile-Analytics コンフル](https://f-scratch.atlassian.net/wiki/display/MAR/31_01_11_02_Documents)
-
-
-## コミットルール
-
- - テンプレートとして .gitmessage.txt を利用する.
-
-## 製品化時に導入するtxtファイルについて
-
- - native, reactnative共に文字コードはutf-8を使用する.
+b→dash mobile SDK is published under the Apache 2.0 License.

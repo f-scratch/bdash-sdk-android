@@ -81,8 +81,11 @@ dependencies {
 mavenPublishing {
     coordinates(GROUP, ARTIFACT_ID, VERSION_NAME)
     publishToMavenCentral(true)
-    signAllPublications()
+    if (project.hasProperty('signingInMemoryKey')) {
+        signAllPublications()
+    }
     configure(new AndroidSingleVariantLibrary("release", true, true))
 }
+
 
 apply from: 'build-library.gradle'
