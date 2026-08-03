@@ -18,7 +18,6 @@
     <application>
         <activity android:name="com.smart_bdash.mobile.analytics.notification.BDashPopupActivity"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
             android:excludeFromRecents="true"
             android:theme="@style/BDashSDK_PopupNotification"
         />

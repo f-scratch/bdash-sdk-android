@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
@@ -12,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -147,6 +149,10 @@ public class BDashPopupActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.com_smart_bdash_mobile_popup_android);
         overridePendingTransition(0,0);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
 
         applyMetaTheme();
 
@@ -404,7 +410,10 @@ public class BDashPopupActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        deleteCacheFile();
+
+        if (!isChangingConfigurations()) {
+            deleteCacheFile();
+        }
 
         isDestroy = true;
         imageView.setImageDrawable(null);
@@ -418,17 +427,17 @@ public class BDashPopupActivity extends Activity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-            synchronized (managedBitmap) {
-                if (managedBitmap.size() > 0) {
-                    for (Bitmap bmp : managedBitmap) {
-                        if (!bmp.isRecycled()) {
-                            bmp.recycle();
+                synchronized (managedBitmap) {
+                    if (managedBitmap.size() > 0) {
+                        for (Bitmap bmp : managedBitmap) {
+                            if (!bmp.isRecycled()) {
+                                bmp.recycle();
+                            }
                         }
+                        managedBitmap.clear();
+                        LogUtil.s( "bitmap recycle");
                     }
-                    managedBitmap.clear();
-                    LogUtil.s( "bitmap recycle");
                 }
-            }
             }
         }, 3000);
     }
@@ -517,7 +526,6 @@ public class BDashPopupActivity extends Activity {
 
         bitmap = BitmapFactory.decodeFile(cacheFile.getAbsolutePath());
 
-        deleteCacheFile();
         return bitmap;
     }
 
