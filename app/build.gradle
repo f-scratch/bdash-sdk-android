@@ -1,4 +1,8 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.android.build.api.artifact.SingleArtifact
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 plugins {
     id 'com.android.library'
@@ -8,12 +12,16 @@ plugins {
 
 android {
 
-    compileSdk rootProject.ext.compileSdkVersion
+    compileSdk {
+        version = release(rootProject.ext.compileSdkVersion as Integer) {
+            minorApiLevel = rootProject.ext.compileSdkMinorVersion as Integer
+        }
+    }
     buildToolsVersion = rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdk = rootProject.ext.minSdkVersion as Integer
+        targetSdk = rootProject.ext.targetSdkVersion as Integer
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -29,7 +37,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -89,3 +97,4 @@ mavenPublishing {
 
 
 apply from: 'build-library.gradle'
+
