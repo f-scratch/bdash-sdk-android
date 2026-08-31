@@ -91,6 +91,7 @@ public class BDashWebReception extends DialogFragment {
     public final static String BDASH_FRAGMENT_TAG  = "--bdash-webview-tag";
     private final static String BDASH_SAVE_CURRENT = "--bdash-save-current";
     private final static String BDASH_SAVE_REPORT  = "--bdash-save-report";
+    private final static String BDASH_SAVE_SIZE_UNIT = "--bdash-save-size-unit";
 
     // Javascript 関数
     private final static String JS_FUNC_SUCCESS = "successWebview";
@@ -1646,6 +1647,7 @@ public class BDashWebReception extends DialogFragment {
                 LogUtil.s(">>一致するか？: " + result);
             }
             current_report = (BDashReport)savedInstanceState.getSerializable(BDASH_SAVE_REPORT);
+            sizeUnit = savedInstanceState.getString(BDASH_SAVE_SIZE_UNIT);
         }
 
         int dialogStyle = current_webReception.getCurrent().hasFilter() ? R.style.BDashSDK_WebPopupModalTheme : R.style.BDashSDK_WebPopupTheme;
@@ -1771,14 +1773,20 @@ public class BDashWebReception extends DialogFragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        LogUtil.s(">>BDashWebReception::onSavedInstanceState");
 
         if( current_webReception != null ) {
-            LogUtil.s(">>BDashWebReception::onSavedInstanceState");
+            LogUtil.s(">> onSavedInstanceState: current_webReception");
             outState.putParcelableArrayList(BDASH_SAVE_CURRENT, current_webReception.receptions);
         }
         // report 状態を引き継げるようにする
         if( current_report != null ){
+            LogUtil.s(">> onSavedInstanceState: current_report");
             outState.putSerializable(BDASH_SAVE_REPORT, current_report);
+        }
+        if ( sizeUnit != null ) {
+            LogUtil.s(">> onSavedInstanceState: sizeUnit");
+            outState.putString(BDASH_SAVE_SIZE_UNIT, sizeUnit);
         }
     }
 
