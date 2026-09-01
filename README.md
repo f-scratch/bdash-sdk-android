@@ -15,7 +15,7 @@ This application requires:
 
     Android Stduio Graffe or higher
     Open JDK・JDK 8 or higher
-    Android Gradle Plugin 9.2.0 or higher
+    Android Gradle Plugin 8.4.0 or higher
     minSdkVersion 24 or higher
 
 

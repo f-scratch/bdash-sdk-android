@@ -2,16 +2,15 @@
 buildscript {
 
     ext {
-        sdkVersion = "7.1.1"        // 現行の SDK バージョン
-        releaseSdkVersion = "7.1.1" // 次リリースする SDK バージョン
+        sdkVersion = "7.0.2"        // 現行の SDK バージョン
+        releaseSdkVersion = "7.0.2" // 次リリースする SDK バージョン
     }
 
     ext {
-        compileSdkVersion = 37
-        compileSdkMinorVersion = 0
-        buildToolsVersion = "36.0.0"
+        compileSdkVersion = 36
+        buildToolsVersion = "34.0.0"
         minSdkVersion = 24
-        targetSdkVersion =  37
+        targetSdkVersion =  36
     }
 
     repositories {
@@ -23,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:9.2.0'
+        classpath 'com.android.tools.build:gradle:8.4.0'
         classpath 'com.vanniktech:gradle-maven-publish-plugin:0.34.0'
     }
 }
