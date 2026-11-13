@@ -1648,6 +1648,7 @@ public class BDashWebReception extends DialogFragment {
             }
             current_report = (BDashReport)savedInstanceState.getSerializable(BDASH_SAVE_REPORT);
             sizeUnit = savedInstanceState.getString(BDASH_SAVE_SIZE_UNIT);
+            setProgressStatus(PROGRESS_CONFIRM);
         }
 
         int dialogStyle = current_webReception.getCurrent().hasFilter() ? R.style.BDashSDK_WebPopupModalTheme : R.style.BDashSDK_WebPopupTheme;

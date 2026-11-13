@@ -24,8 +24,6 @@ import android.os.Looper;
 import android.os.Vibrator;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKey;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -71,10 +69,9 @@ public class BDashNotification {
     private MobileSDKManager sdkManager;
     private AbstractConnectControllerCreator connectControllerCreator = new ConnectClientControllerCreator();
 
+    // 通知設定など機密でない値を保持する prefs.
+    // 機密情報(FCM トークン)は NotificationTokenStorage で暗号化して別ファイルに保存する
     private final static String PREFERENCE_NAME        = "com.smart_bdash.mobile.analytics.notification";
-    // 機密情報(FCM トークン)を暗号化保存する prefs. 平文の PREFERENCE_NAME とは分離する
-    private final static String SECURE_PREFERENCE_NAME = "com.smart_bdash.mobile.analytics.notification.secure";
-    private final static String PROPERTY_REG_ID        = "regId";
     private final static String PROPERTY_ENABLE        = "enable";        // ローカル視点での有効無効 / FCM サービスクラスの実行判定
     private final static String PROPERTY_SERVER_ENABLE = "serverEnable";  // サーバー視点での有効無効 / 通知をアプリに行うかの判定
     private final static String PROPERTY_APP_VERSION   = "version";
@@ -82,6 +79,10 @@ public class BDashNotification {
     private final static String PROPERTY_POPUP_USE_VIBRATION = "popupUseVib";
 
     private final static String TYPE_DIALOG = "dialog";
+
+    // FCM トークンの暗号化ストレージ. 初回利用時に生成する
+    private volatile NotificationTokenStorage tokenStorage;
+    private final Object tokenStorageLock = new Object();
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
     Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -624,23 +625,9 @@ public class BDashNotification {
      */
     public String getRegistrationId() {
         Context context = MobileSDKManager.getInstance().getContext();
-        final SharedPreferences prefs = getSecurePreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-
-        // 旧バージョンの平文 prefs にトークンが残っていれば暗号化 prefs へ移行する
-        if (registrationId.isEmpty()) {
-            String legacyId = getPreferences(context).getString(PROPERTY_REG_ID, "");
-            if (!legacyId.isEmpty()) {
-                prefs.edit().putString(PROPERTY_REG_ID, legacyId).commit();
-                getPreferences(context).edit().remove(PROPERTY_REG_ID).commit();
-                registrationId = legacyId;
-            }
-        }
-
-        if (registrationId.isEmpty()) {
-            return null;
-        }
-        return registrationId;
+        // 旧バージョンのトークン(平文 prefs / ESP )は
+        // NotificationTokenStorage が初回アクセス時に自動で移行する
+        return getTokenStorage(context).getToken();
     }
 
     /***
@@ -654,50 +641,24 @@ public class BDashNotification {
     }
 
     /***
-     * FCM トークン等の機密情報を暗号化保存する SharedPreferences を取得する.<br>
+     * FCM トークンの暗号化ストレージを取得する.<br>
      *  ・Android Keystore で管理する鍵で暗号化されるため、Root 化端末でファイルを読み取られても値は保護される<br>
-     *  ・Keystore の不整合等で生成・復号に失敗した場合は、破損ファイルを削除して再生成する
+     *  ・復号できない場合は例外を投げずに null を返す(ホストアプリの処理を止めない)
      * @param context
-     * @return 暗号化された SharedPreferences
+     * @return トークンストレージ
      */
-    private SharedPreferences getSecurePreferences(Context context) {
-        try {
-            return createEncryptedPreferences(context);
-        } catch (Exception e) {
-            LogUtil.out(e);
-            deleteSecurePreferencesFile(context);
-            try {
-                return createEncryptedPreferences(context);
-            } catch (Exception e2) {
-                LogUtil.out(e2);
-                throw new RuntimeException(e2);
+    private NotificationTokenStorage getTokenStorage(Context context) {
+        NotificationTokenStorage storage = tokenStorage;
+        if (storage == null) {
+            synchronized (tokenStorageLock) {
+                storage = tokenStorage;
+                if (storage == null) {
+                    storage = new NotificationTokenStorage(context);
+                    tokenStorage = storage;
+                }
             }
         }
-    }
-
-    private SharedPreferences createEncryptedPreferences(Context context) throws Exception {
-        MasterKey masterKey = new MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build();
-        return EncryptedSharedPreferences.create(
-                context,
-                SECURE_PREFERENCE_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        );
-    }
-
-    private void deleteSecurePreferencesFile(Context context) {
-        try {
-            File prefFile = new File(context.getApplicationInfo().dataDir
-                    + "/shared_prefs/" + SECURE_PREFERENCE_NAME + ".xml");
-            if (prefFile.exists()) {
-                prefFile.delete();
-            }
-        } catch (Exception ignore) {
-            // 削除に失敗しても致命的ではない
-        }
+        return storage;
     }
 
     /***
@@ -707,8 +668,8 @@ public class BDashNotification {
      * @param regId
      */
     public void storeFCMToken(Context context, String regId){
-        // トークンは暗号化 prefs、機密でないアプリバージョンは平文 prefs に分けて保存する
-        getSecurePreferences(context).edit().putString(PROPERTY_REG_ID, regId).commit();
+        // トークンは暗号化ストレージ、機密でないアプリバージョンは平文 prefs に分けて保存する
+        getTokenStorage(context).saveToken(regId);
 
         int appVersion = DeviceUtil.getVersionCode(context);
         getPreferences(context).edit().putInt(PROPERTY_APP_VERSION, appVersion).commit();
